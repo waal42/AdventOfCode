@@ -1,6 +1,4 @@
 from time import time
-from copy import deepcopy
-# from pprint import pprint
 
 start = time()
 data = dict()
@@ -24,12 +22,42 @@ def part_one():
             print(item)
 
 
+def is_last_level(program):
+    if not data[program][1]:
+        return True
+    else:
+        return False
+
+
+def weight_above(program):
+    if is_last_level(program):
+        return data[program][0]
+    else:
+        total = data[program][0]
+        for subprogram in data[program][1]:
+            total += weight_above(subprogram)
+        return total
+
+
+def get_children(program):
+    for subprogram in data[program][1]:
+        print(program, data[program], subprogram, data[subprogram])
+
+
 def part_two():
-    check = True
-    while check:
-        copy_of_data = deepcopy(data)
+    for program in data.keys():
+        if not is_last_level(program):
+            check_weight = list()
+            for subprogram in data[program][1]:
+                check_weight.append((subprogram, weight_above(subprogram)))
+            total = 0
+            for subprogram in check_weight:
+                total += subprogram[1]
+            if total // len(check_weight) != check_weight[0][1]:
+                print(program, check_weight)
 
 
 part_two()
+get_children('gveca')
 runtime = time() - start
 print('finished in ' + str(runtime) + ' seconds')
