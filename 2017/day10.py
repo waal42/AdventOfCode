@@ -75,11 +75,11 @@ def count_dense_hash(data):
             else '0' + hex(sub_dense_hash)[2:]
         dense_hash.append(hex_sub_dense_hash)
     str_dense_hash = ''.join(dense_hash)
-    print(str_dense_hash)
+    return str_dense_hash
 
 
 knot_hash(day10input)
-count_dense_hash(day10input)
+print(count_dense_hash(day10input))
 
 runtime = time() - start
 print('finished in ' + str(runtime) + ' seconds')
