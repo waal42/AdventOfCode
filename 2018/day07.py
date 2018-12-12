@@ -1,6 +1,5 @@
 from time import time
 from pprint import pprint
-from itertools import cycle
 import re
 
 start = time()
@@ -28,7 +27,6 @@ def part_one():
         scheme[instr[0]]["needed_for"].append(instr[1])
         scheme[instr[1]]["blocked_by"].append(instr[0])
         blocked.append(instr[1])
-    pprint(scheme)
     while len(order) != len(sorted_parts):
         buffer = sorted(
             [
@@ -39,13 +37,12 @@ def part_one():
         )
         order.append(buffer[0])
         scheme[buffer[0]]["built"] = True
-        print("".join(order))
         for part in scheme[buffer[0]]["needed_for"]:
             scheme[part]["blocked_by"].pop(scheme[part]["blocked_by"].index(buffer[0]))
     print("".join(order))
 
 
-# part_one()
+part_one()
 
 
 def part_two():
@@ -71,7 +68,6 @@ def part_two():
         scheme[instr[0]]["needed_for"].append(instr[1])
         scheme[instr[1]]["blocked_by"].append(instr[0])
         blocked.append(instr[1])
-    # pprint(scheme)
     while len(order) != len(sorted_parts):
         free_workers = [x for x in workers.keys() if workers[x]["working"] == False]
         if len(free_workers) != 0:
@@ -86,24 +82,13 @@ def part_two():
                     )
                 ]
             )
-            # print("free workers: " + str(free_workers) + ", buffer: " + str(buffer))
             to_assign = min(len(free_workers), len(buffer))
             for worker in range(to_assign):
                 workers[free_workers[worker]]["working"] = True
                 workers[free_workers[worker]]["working_on"] = buffer[worker]
                 scheme[buffer[worker]]["in_progress"] = True
         working_workers = [x for x in workers.keys() if workers[x]["working"] == True]
-        # print(elapsed_time, working_workers, free_workers)
         for worker in working_workers:
-            """print(
-                "worker "
-                + str(worker)
-                + " working on part "
-                + str(workers[worker]["working_on"])
-                + " with time to built being "
-                + str(scheme[workers[worker]["working_on"]]["time_to_build"])
-                + " seconds"
-            )"""
             scheme[workers[worker]["working_on"]]["time_to_build"] -= 1
             if scheme[workers[worker]["working_on"]]["time_to_build"] == 0:
                 scheme[workers[worker]["working_on"]]["built"] = True
