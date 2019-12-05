@@ -5,43 +5,63 @@ start = time()
 with open("day03input.txt", "r") as file_in:
     instructions = [instr.split(",") for instr in file_in.read().rstrip().split("\n")]
 
-def calculate_step(direction, position):
+
+def new_position(direction, x, y):
     if direction == 'L':
-        position = (position[0] - 1, position[1])
+        x -= 1
     elif direction == 'R':
-        position = (position[0] + 1, position[1])
+        x += 1
     elif direction == 'U':
-        position = (position[0], position[1] + 1)
+        y += 1
     elif direction == 'D':
-        position = (position[0], position[1] - 1)
-    return position
-
-
+        y -= 1
+    return x, y
 
 def part_one():
-    start = (0, 0)
-    path_one = [start]
-    position = start
+    x, y = 0, 0
+    path_one = {y:[x]}
     for walk in instructions[0]:
         direction = walk[0]
         for step in range(int(walk[1:])):
-            position = calculate_step(direction, position)
-            path_one.append(position)
-    path_two = [start]
-    position = start
-    crosses = list()
+            x, y = new_position(direction, x, y)
+            if y in path_one.keys():
+                path_one[y].append(x)
+            else:
+                path_one[y] = [x]
+    x, y = 0, 0
+    crosses = dict()
+    second_steps = 0
     for walk in instructions[1]:
         direction = walk[0]
         for step in range(int(walk[1:])):
-            position = calculate_step(direction, position)
-            if position in path_one:
-                crosses.append(position)
-            path_two.append(position)
+            x, y = new_position(direction, x, y)
+            second_steps += 1
+            if y in path_one.keys():
+                if x in path_one[y]:
+                    if (x,y) not in crosses.keys():
+                        crosses[(x,y)] = second_steps
     distances = [abs(cross[0]) + abs(cross[1]) for cross in crosses]
     print(crosses)
     print(distances)
     print(min(distances))
+    return crosses    
 
-# part_one()
+
+def part_two():
+    crosses = part_one()
+    x, y = 0, 0
+    first_steps = 0
+    cross_distances = list()
+    for walk in instructions[0]:
+        direction = walk[0]
+        for step in range(int(walk[1:])):
+            x, y = new_position(direction, x, y)
+            first_steps += 1
+            if (x,y) in crosses.keys():
+                cross_distances.append(first_steps + crosses[x,y])
+    print(cross_distances)
+    print(min(cross_distances))
+
+part_two()
 
 print("computed in " + str(time() - start) + " seconds")
