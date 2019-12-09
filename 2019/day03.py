@@ -44,7 +44,7 @@ def part_one():
     print(crosses)
     print(distances)
     print(min(distances))
-    return crosses    
+    return crosses
 
 
 def part_two():
