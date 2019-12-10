@@ -14,9 +14,6 @@ with open("day06input.txt", "r") as file_in:
             direct_orbits[orbit[0]] = [orbit[1]]
 
 
-# pprint(direct_orbits)
-
-
 def find_child_orbiters(orbitee):
     orbiters_list = list()
     if orbitee in direct_orbits.keys():
