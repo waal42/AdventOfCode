@@ -24,7 +24,7 @@ def is_part_one_pwd(pwd):
     never_decrease = list()
     str_pwd = str(pwd)
     for digit in range(len(str_pwd) - 1):
-        if str_pwd[digit] == str_pwd[digit + 1]:
+        if str_pwd[digit] == str_pwd[digit + 1]:    
             two_adjacent = True
         if str_pwd[digit] <= str_pwd[digit + 1]:
             never_decrease.append(1)
