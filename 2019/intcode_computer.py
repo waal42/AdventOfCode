@@ -1,3 +1,14 @@
+class IntcodeComputer:
+
+    def __init__(self, intcode, noun = None, verb = None, intcode_input = None):
+        self.intcode = intcode
+        self.noun = noun
+        self.verb = verb
+        self.intcode_input = intcode_input
+        self.index = 0
+
+    def execute_optcode(self, intcode, index):
+        pass
 
 
 def load_intcode(file_input):
@@ -46,10 +57,18 @@ def run_intcode(intcode, noun = None, verb = None, intcode_in = None):
             index += 4
         ### WRITE INPUT
         elif opcode[-2:] == '03':
+            if isinstance(intcode_in, list):
+                this_input = intcode_in[0]
+                if len(intcode_in) == 2:
+                    intcode_in = intcode_in[1]
+                else:
+                    intcode_in = intcode_in[1:]
+            else:
+                this_input = intcode_in
             if opcode[2] == '0':
-                intcode[intcode[index + 1]] = intcode_in
+                intcode[intcode[index + 1]] = this_input
             elif opcode[2] == '1':
-                intcode[index + 1] = intcode_in
+                intcode[index + 1] = this_input
             index += 2
         ### READ OUTPUT
         elif opcode[-2:] == '04':
@@ -123,7 +142,7 @@ def run_intcode(intcode, noun = None, verb = None, intcode_in = None):
             print("error")
             break
     if intcode_out:
-        return intcode_out
+        return intcode_out[0]
     else:
         return intcode[0]
 
@@ -132,3 +151,5 @@ def run_intcode(intcode, noun = None, verb = None, intcode_in = None):
 # print(run_intcode([1002,4,3,4,33], intcode_in=42))
 
 #print(run_intcode([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], intcode_in=8))
+
+# print(run_intcode([3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0], intcode_in=1))
