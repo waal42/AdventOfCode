@@ -2,13 +2,145 @@ class IntcodeComputer:
 
     def __init__(self, intcode, noun = None, verb = None, intcode_input = None):
         self.intcode = intcode
-        self.noun = noun
-        self.verb = verb
         self.intcode_input = intcode_input
         self.index = 0
+        self.state = "working"
+        if noun and verb:
+            self.intcode[1] = noun
+            self.intcode[2] = verb
 
-    def execute_optcode(self, intcode, index):
-        pass
+    
+    def execute_opcode(self):
+        intcode_output = list()
+        opcode = ''.join(['0' for x in range(5 - len(str(self.intcode[self.index])))]) + str(self.intcode[self.index])
+        '''
+        každému opcode, na který metoda narazí, jsou nejprve přidány nuly do začátku tak, aby délka řetězce opcode byla 5 
+        poslední dva znaky určují, o který opcode se jedná (operátor)
+        znaky před nimi jsou parametry upravující chování operandů:
+         - 0 říká, že operand nalezneme na pozici, která je vyčtena z pozice za opcode
+         - 1 říká, že operand je přímo na pozici za opcode
+        '''
+        ### ADDITION
+        if opcode[-2:] == '01':
+            if opcode[2] == '0':
+                first = self.intcode[self.intcode[self.index + 1]]
+            elif opcode[2] == '1':
+                first = self.intcode[self.index + 1]
+            if opcode[1] == '0':
+                second = self.intcode[self.intcode[self.index + 2]]
+            elif opcode[1] == '1':
+                second = self.intcode[self.index + 2]
+            if opcode[0] == '0':
+                self.intcode[self.intcode[self.index + 3]] = first + second
+            elif opcode[0] == '1':
+                self.intcode[self.index + 3] = first + second
+            self.index += 4
+        ### MULTIPLICATION
+        elif opcode[-2:] == '02':
+            if opcode[2] == '0':
+                first = self.intcode[self.intcode[self.index + 1]]
+            elif opcode[2] == '1':
+                first = self.intcode[self.index + 1]
+            if opcode[1] == '0':
+                second = self.intcode[self.intcode[self.index + 2]]
+            elif opcode[1] == '1':
+                second = self.intcode[self.index + 2]
+            if opcode[0] == '0':
+                self.intcode[self.intcode[self.index + 3]] = first + second
+            elif opcode[0] == '1':
+                self.intcode[self.index + 3] = first + second
+            self.index += 4
+        ### WRITE INPUT
+        elif opcode[-2:] == '03':
+            if not self.intcode_input:
+                self.state = "waiting"
+            if isinstance(self.intcode_input, list):
+                this_input = self.intcode_input[0]
+                if len(self.intcode_input) == 2:
+                    self.intcode_input = self.intcode_input[1]
+                else:
+                    self.intcode_input = self.intcode_input[1:]
+            else:
+                this_input = self.intcode_input
+            if opcode[2] == '0':
+                self.intcode[self.intcode[self.index + 1]] = this_input
+            elif opcode[2] == '1':
+                self.intcode[self.index + 1] = this_input
+            self.index += 2
+        ### READ OUTPUT
+        elif opcode[-2:] == '04':
+            if opcode[2] == '0':
+                intcode_output.append(self.intcode[self.intcode[self.index + 1]])
+            elif opcode[2] == '1':
+                intcode_output.append(self.intcode[self.index + 1])
+            self.index += 2
+        ### JUMP IF TRUE
+        elif opcode[-2:] == '05':
+            if opcode[2] == '0':
+                operand = self.intcode[self.intcode[self.index + 1]]
+            elif opcode[2] == '1':
+                operand = self.intcode[self.index + 1]
+            if operand:
+                if opcode[1] == '0':
+                    self.index = self.intcode[self.intcode[self.index + 2]]
+                elif opcode[1] == '1':
+                    self.index = self.intcode[self.index + 2]
+            else:
+                self.index += 3
+        ### JUMP IF FALSE
+        elif opcode[-2:] == '06':
+            if opcode[2] == '0':
+                operand = self.intcode[self.intcode[self.index + 1]]
+            elif opcode[2] == '1':
+                operand = self.intcode[self.index + 1]
+            if not operand:
+                if opcode[1] == '0':
+                    self.index = self.intcode[self.intcode[self.index + 2]]
+                elif opcode[1] == '1':
+                    self.index = self.intcode[self.index + 2]
+            else:
+                self.index += 3
+        ### LESS THAN
+        elif opcode[-2:] == '07':
+            if opcode[2] == '0':
+                first = self.intcode[self.intcode[self.index + 1]]
+            elif opcode[2] == '1':
+                first = self.intcode[self.index + 1]
+            if opcode[1] == '0':
+                second = self.intcode[self.intcode[self.index + 2]]
+            elif opcode[1] == '1':
+                second = self.intcode[self.index + 2]
+            output = 1 if first < second else 0
+            if opcode[0] == '0':
+                self.intcode[self.intcode[self.index + 3]] = output
+            elif opcode[0] == '1':
+                self.intcode[self.index + 3] = output
+            self.index += 4
+        ### EQUALS
+        elif opcode[-2:] == '08':
+            if opcode[2] == '0':
+                first = self.intcode[self.intcode[self.index + 1]]
+            elif opcode[2] == '1':
+                first = self.intcode[self.index + 1]
+            if opcode[1] == '0':
+                second = self.intcode[self.intcode[self.index + 2]]
+            elif opcode[1] == '1':
+                second = self.intcode[self.index + 2]
+            output = 1 if first == second else 0
+            if opcode[0] == '0':
+                self.intcode[self.intcode[self.index + 3]] = output
+            elif opcode[0] == '1':
+                self.intcode[self.index + 3] = output
+            self.index += 4
+        ### HALT CODE
+        elif opcode[-2:] == '99':
+            self.state = "halted"
+        else:
+            self.state = "unexpected"
+        if intcode_output:
+            return intcode_output
+        else:
+            return 0
 
 
 def load_intcode(file_input):
