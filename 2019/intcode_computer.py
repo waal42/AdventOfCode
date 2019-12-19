@@ -1,18 +1,24 @@
 class IntcodeComputer:
 
-    def __init__(self, intcode, noun = None, verb = None, intcode_input = None):
-        self.intcode = intcode
-        self.intcode_input = intcode_input
+    def __init__(self, intcode, noun = None, verb = None, intcode_input = None, designation = None):
+        self.intcode = [x for x in intcode]
+        self.max_index = len(self.intcode) - 1
+        self.intcode_input = intcode_input if isinstance(intcode_input, list) else [intcode_input]
         self.index = 0
-        self.state = "working"
+        self.state = "running" # states: running, waiting, halted, unexpected
+        self.output = None
+        self.designation = designation
         if noun and verb:
             self.intcode[1] = noun
             self.intcode[2] = verb
 
     
     def execute_opcode(self):
-        intcode_output = list()
+        if self.index > self.max_index:
+            print("error")
+            return "error"
         opcode = ''.join(['0' for x in range(5 - len(str(self.intcode[self.index])))]) + str(self.intcode[self.index])
+        #print("processing opcode " + opcode + " on machine " + str(self.designation))
         '''
         každému opcode, na který metoda narazí, jsou nejprve přidány nuly do začátku tak, aby délka řetězce opcode byla 5 
         poslední dva znaky určují, o který opcode se jedná (operátor)
@@ -46,33 +52,29 @@ class IntcodeComputer:
             elif opcode[1] == '1':
                 second = self.intcode[self.index + 2]
             if opcode[0] == '0':
-                self.intcode[self.intcode[self.index + 3]] = first + second
+                self.intcode[self.intcode[self.index + 3]] = first * second
             elif opcode[0] == '1':
-                self.intcode[self.index + 3] = first + second
+                self.intcode[self.index + 3] = first * second
             self.index += 4
         ### WRITE INPUT
         elif opcode[-2:] == '03':
             if not self.intcode_input:
                 self.state = "waiting"
-            if isinstance(self.intcode_input, list):
-                this_input = self.intcode_input[0]
-                if len(self.intcode_input) == 2:
-                    self.intcode_input = self.intcode_input[1]
-                else:
-                    self.intcode_input = self.intcode_input[1:]
             else:
-                this_input = self.intcode_input
-            if opcode[2] == '0':
-                self.intcode[self.intcode[self.index + 1]] = this_input
-            elif opcode[2] == '1':
-                self.intcode[self.index + 1] = this_input
-            self.index += 2
+                this_input = self.intcode_input[0]
+                self.intcode_input = self.intcode_input[1:]
+                # print(this_input, self.intcode_input)
+                if opcode[2] == '0':
+                    self.intcode[self.intcode[self.index + 1]] = this_input
+                elif opcode[2] == '1':
+                    self.intcode[self.index + 1] = this_input
+                self.index += 2
         ### READ OUTPUT
         elif opcode[-2:] == '04':
             if opcode[2] == '0':
-                intcode_output.append(self.intcode[self.intcode[self.index + 1]])
+                self.output = self.intcode[self.intcode[self.index + 1]]
             elif opcode[2] == '1':
-                intcode_output.append(self.intcode[self.index + 1])
+                self.output = self.intcode[self.index + 1]
             self.index += 2
         ### JUMP IF TRUE
         elif opcode[-2:] == '05':
@@ -137,12 +139,28 @@ class IntcodeComputer:
             self.state = "halted"
         else:
             self.state = "unexpected"
-        if intcode_output:
-            return intcode_output
-        else:
-            return 0
+        # print(self.intcode)
+
+    def computer_state(self):
+        return self.state
+
+    
+    def new_input(self, input):
+        self.intcode_input.append(input)
+        self.state = "running"
+
+    
+    def new_output(self):
+        return self.output
 
 
+    def current_status(self):
+        return self.state, self.index, self.max_index, self.output
+
+
+
+# OLD INTCODE COMPUTER (PROCEDURAL)
+"""
 def load_intcode(file_input):
     with open(file_input, 'r') as fin:
         intcode = [int(x) for x in fin.read().rstrip().split(",")]
@@ -285,3 +303,5 @@ def run_intcode(intcode, noun = None, verb = None, intcode_in = None):
 #print(run_intcode([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], intcode_in=8))
 
 # print(run_intcode([3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0], intcode_in=1))
+
+"""
