@@ -1,6 +1,6 @@
 class IntcodeComputer:
 
-    def __init__(self, intcode, noun = None, verb = None, intcode_input = None, designation = None):
+    def __init__(self, intcode, noun = None, verb = None, intcode_input = None, designation = None, relative_base = None):
         self.intcode = [x for x in intcode]
         self.max_index = len(self.intcode) - 1
         self.intcode_input = intcode_input if isinstance(intcode_input, list) else [intcode_input]
@@ -8,6 +8,7 @@ class IntcodeComputer:
         self.state = "running" # states: running, waiting, halted, unexpected
         self.output = None
         self.designation = designation
+        self.relative_base = relative_base
         if noun and verb:
             self.intcode[1] = noun
             self.intcode[2] = verb
@@ -32,14 +33,20 @@ class IntcodeComputer:
                 first = self.intcode[self.intcode[self.index + 1]]
             elif opcode[2] == '1':
                 first = self.intcode[self.index + 1]
+            elif opcode[2] == '2':
+                first = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             if opcode[1] == '0':
                 second = self.intcode[self.intcode[self.index + 2]]
             elif opcode[1] == '1':
                 second = self.intcode[self.index + 2]
+            elif opcode[1] == '2':
+                second = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             if opcode[0] == '0':
                 self.intcode[self.intcode[self.index + 3]] = first + second
             elif opcode[0] == '1':
                 self.intcode[self.index + 3] = first + second
+            elif opcode[0] == '2':
+                self.intcode[self.intcode[self.index + 3] + self.relative_base] = first + second
             self.index += 4
         ### MULTIPLICATION
         elif opcode[-2:] == '02':
@@ -47,14 +54,20 @@ class IntcodeComputer:
                 first = self.intcode[self.intcode[self.index + 1]]
             elif opcode[2] == '1':
                 first = self.intcode[self.index + 1]
+            elif opcode[2] == '2':
+                first = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             if opcode[1] == '0':
                 second = self.intcode[self.intcode[self.index + 2]]
             elif opcode[1] == '1':
                 second = self.intcode[self.index + 2]
+            elif opcode[1] == '2':
+                second = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             if opcode[0] == '0':
                 self.intcode[self.intcode[self.index + 3]] = first * second
             elif opcode[0] == '1':
                 self.intcode[self.index + 3] = first * second
+            elif opcode[0] == '2':
+                self.intcode[self.intcode[self.index + 3] + self.relative_base] = first * second
             self.index += 4
         ### WRITE INPUT
         elif opcode[-2:] == '03':
@@ -68,6 +81,8 @@ class IntcodeComputer:
                     self.intcode[self.intcode[self.index + 1]] = this_input
                 elif opcode[2] == '1':
                     self.intcode[self.index + 1] = this_input
+                elif opcode[2] == '2':
+                    self.intcode[self.intcode[self.index + 1] + self.relative_base] = this_input
                 self.index += 2
         ### READ OUTPUT
         elif opcode[-2:] == '04':
@@ -75,6 +90,8 @@ class IntcodeComputer:
                 self.output = self.intcode[self.intcode[self.index + 1]]
             elif opcode[2] == '1':
                 self.output = self.intcode[self.index + 1]
+            elif opcode[2] == '2':
+                self.output = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             self.index += 2
         ### JUMP IF TRUE
         elif opcode[-2:] == '05':
@@ -82,11 +99,15 @@ class IntcodeComputer:
                 operand = self.intcode[self.intcode[self.index + 1]]
             elif opcode[2] == '1':
                 operand = self.intcode[self.index + 1]
+            elif opcode[2] == '2':
+                operand = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             if operand:
                 if opcode[1] == '0':
                     self.index = self.intcode[self.intcode[self.index + 2]]
                 elif opcode[1] == '1':
                     self.index = self.intcode[self.index + 2]
+                elif opcode[1] == '2':
+                    self.index = self.intcode[self.intcode[self.index + 2] + self.relative_base]
             else:
                 self.index += 3
         ### JUMP IF FALSE
@@ -95,11 +116,15 @@ class IntcodeComputer:
                 operand = self.intcode[self.intcode[self.index + 1]]
             elif opcode[2] == '1':
                 operand = self.intcode[self.index + 1]
+            elif opcode[2] == '2':
+                operand = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             if not operand:
                 if opcode[1] == '0':
                     self.index = self.intcode[self.intcode[self.index + 2]]
                 elif opcode[1] == '1':
                     self.index = self.intcode[self.index + 2]
+                elif opcode[1] == '2':
+                    self.index = self.intcode[self.intcode[self.index + 2] + self.relative_base]
             else:
                 self.index += 3
         ### LESS THAN
@@ -108,15 +133,21 @@ class IntcodeComputer:
                 first = self.intcode[self.intcode[self.index + 1]]
             elif opcode[2] == '1':
                 first = self.intcode[self.index + 1]
+            elif opcode[2] == '2':
+                first = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             if opcode[1] == '0':
                 second = self.intcode[self.intcode[self.index + 2]]
             elif opcode[1] == '1':
                 second = self.intcode[self.index + 2]
+            elif opcode[1] == '2':
+                second = self.intcode[self.intcode[self.index + 2] + self.relative_base]
             output = 1 if first < second else 0
             if opcode[0] == '0':
                 self.intcode[self.intcode[self.index + 3]] = output
             elif opcode[0] == '1':
                 self.intcode[self.index + 3] = output
+            elif opcode[0] == '2':
+                self.intcode[self.intcode[self.index + 3] + self.relative_base] = output
             self.index += 4
         ### EQUALS
         elif opcode[-2:] == '08':
@@ -124,16 +155,23 @@ class IntcodeComputer:
                 first = self.intcode[self.intcode[self.index + 1]]
             elif opcode[2] == '1':
                 first = self.intcode[self.index + 1]
+            elif opcode[2] == '2':
+                first = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             if opcode[1] == '0':
                 second = self.intcode[self.intcode[self.index + 2]]
             elif opcode[1] == '1':
                 second = self.intcode[self.index + 2]
+            elif opcode[1] == '2':
+                second = self.intcode[self.intcode[self.index + 1] + self.relative_base]
             output = 1 if first == second else 0
             if opcode[0] == '0':
                 self.intcode[self.intcode[self.index + 3]] = output
             elif opcode[0] == '1':
                 self.intcode[self.index + 3] = output
             self.index += 4
+        ### ADJUST RELATIVE BASE
+        elif opcode[-2:] == '09':
+            pass #TODO(opcode 09)
         ### HALT CODE
         elif opcode[-2:] == '99':
             self.state = "halted"
