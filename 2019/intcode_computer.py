@@ -1,24 +1,26 @@
 class IntcodeComputer:
 
-    def __init__(self, intcode, noun = None, verb = None, intcode_input = None, designation = None, relative_base = None):
-        self.intcode = [x for x in intcode]
-        self.max_index = len(self.intcode) - 1
-        self.intcode_input = intcode_input if isinstance(intcode_input, list) else [intcode_input]
+    def __init__(self, intcode, noun = None, verb = None, intcode_input = None, designation = None, relative_base = 0):
+        self.memory = [x for x in intcode] + [0 for x in range(65536 - len(intcode))]
+        #self.memory = [x for x in intcode]
+        self.max_index = len(self.memory) - 1
+        self.memory_input = intcode_input if isinstance(intcode_input, list) else [intcode_input]
         self.index = 0
         self.state = "running" # states: running, waiting, halted, unexpected
         self.output = None
         self.designation = designation
         self.relative_base = relative_base
         if noun and verb:
-            self.intcode[1] = noun
-            self.intcode[2] = verb
+            self.memory[1] = noun
+            self.memory[2] = verb
 
     
     def execute_opcode(self):
+        self.output = None
         if self.index > self.max_index:
             print("error")
             return "error"
-        opcode = ''.join(['0' for x in range(5 - len(str(self.intcode[self.index])))]) + str(self.intcode[self.index])
+        opcode = ''.join(['0' for x in range(5 - len(str(self.memory[self.index])))]) + str(self.memory[self.index])
         #print("processing opcode " + opcode + " on machine " + str(self.designation))
         '''
         každému opcode, na který metoda narazí, jsou nejprve přidány nuly do začátku tak, aby délka řetězce opcode byla 5 
@@ -30,161 +32,169 @@ class IntcodeComputer:
         ### ADDITION
         if opcode[-2:] == '01':
             if opcode[2] == '0':
-                first = self.intcode[self.intcode[self.index + 1]]
+                first = self.memory[self.memory[self.index + 1]]
             elif opcode[2] == '1':
-                first = self.intcode[self.index + 1]
+                first = self.memory[self.index + 1]
             elif opcode[2] == '2':
-                first = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                first = self.memory[self.memory[self.index + 1] + self.relative_base]
             if opcode[1] == '0':
-                second = self.intcode[self.intcode[self.index + 2]]
+                second = self.memory[self.memory[self.index + 2]]
             elif opcode[1] == '1':
-                second = self.intcode[self.index + 2]
+                second = self.memory[self.index + 2]
             elif opcode[1] == '2':
-                second = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                second = self.memory[self.memory[self.index + 2] + self.relative_base]
             if opcode[0] == '0':
-                self.intcode[self.intcode[self.index + 3]] = first + second
+                self.memory[self.memory[self.index + 3]] = first + second
             elif opcode[0] == '1':
-                self.intcode[self.index + 3] = first + second
+                self.memory[self.index + 3] = first + second
             elif opcode[0] == '2':
-                self.intcode[self.intcode[self.index + 3] + self.relative_base] = first + second
+                self.memory[self.memory[self.index + 3] + self.relative_base] = first + second
             self.index += 4
         ### MULTIPLICATION
         elif opcode[-2:] == '02':
             if opcode[2] == '0':
-                first = self.intcode[self.intcode[self.index + 1]]
+                first = self.memory[self.memory[self.index + 1]]
             elif opcode[2] == '1':
-                first = self.intcode[self.index + 1]
+                first = self.memory[self.index + 1]
             elif opcode[2] == '2':
-                first = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                first = self.memory[self.memory[self.index + 1] + self.relative_base]
             if opcode[1] == '0':
-                second = self.intcode[self.intcode[self.index + 2]]
+                second = self.memory[self.memory[self.index + 2]]
             elif opcode[1] == '1':
-                second = self.intcode[self.index + 2]
+                second = self.memory[self.index + 2]
             elif opcode[1] == '2':
-                second = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                second = self.memory[self.memory[self.index + 2] + self.relative_base]
             if opcode[0] == '0':
-                self.intcode[self.intcode[self.index + 3]] = first * second
+                self.memory[self.memory[self.index + 3]] = first * second
             elif opcode[0] == '1':
-                self.intcode[self.index + 3] = first * second
+                self.memory[self.index + 3] = first * second
             elif opcode[0] == '2':
-                self.intcode[self.intcode[self.index + 3] + self.relative_base] = first * second
+                self.memory[self.memory[self.index + 3] + self.relative_base] = first * second
             self.index += 4
         ### WRITE INPUT
         elif opcode[-2:] == '03':
-            if not self.intcode_input:
+            if not self.memory_input:
                 self.state = "waiting"
             else:
-                this_input = self.intcode_input[0]
-                self.intcode_input = self.intcode_input[1:]
-                # print(this_input, self.intcode_input)
+                this_input = self.memory_input[0]
+                self.memory_input = self.memory_input[1:]
+                # print(this_input, self.memory_input)
                 if opcode[2] == '0':
-                    self.intcode[self.intcode[self.index + 1]] = this_input
+                    self.memory[self.memory[self.index + 1]] = this_input
                 elif opcode[2] == '1':
-                    self.intcode[self.index + 1] = this_input
+                    self.memory[self.index + 1] = this_input
                 elif opcode[2] == '2':
-                    self.intcode[self.intcode[self.index + 1] + self.relative_base] = this_input
+                    self.memory[self.memory[self.index + 1] + self.relative_base] = this_input
                 self.index += 2
         ### READ OUTPUT
         elif opcode[-2:] == '04':
             if opcode[2] == '0':
-                self.output = self.intcode[self.intcode[self.index + 1]]
+                self.output = self.memory[self.memory[self.index + 1]]
             elif opcode[2] == '1':
-                self.output = self.intcode[self.index + 1]
+                self.output = self.memory[self.index + 1]
             elif opcode[2] == '2':
-                self.output = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                self.output = self.memory[self.memory[self.index + 1] + self.relative_base]
             self.index += 2
         ### JUMP IF TRUE
         elif opcode[-2:] == '05':
             if opcode[2] == '0':
-                operand = self.intcode[self.intcode[self.index + 1]]
+                operand = self.memory[self.memory[self.index + 1]]
             elif opcode[2] == '1':
-                operand = self.intcode[self.index + 1]
+                operand = self.memory[self.index + 1]
             elif opcode[2] == '2':
-                operand = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                operand = self.memory[self.memory[self.index + 1] + self.relative_base]
             if operand:
                 if opcode[1] == '0':
-                    self.index = self.intcode[self.intcode[self.index + 2]]
+                    self.index = self.memory[self.memory[self.index + 2]]
                 elif opcode[1] == '1':
-                    self.index = self.intcode[self.index + 2]
+                    self.index = self.memory[self.index + 2]
                 elif opcode[1] == '2':
-                    self.index = self.intcode[self.intcode[self.index + 2] + self.relative_base]
+                    self.index = self.memory[self.memory[self.index + 2] + self.relative_base]
             else:
                 self.index += 3
         ### JUMP IF FALSE
         elif opcode[-2:] == '06':
             if opcode[2] == '0':
-                operand = self.intcode[self.intcode[self.index + 1]]
+                operand = self.memory[self.memory[self.index + 1]]
             elif opcode[2] == '1':
-                operand = self.intcode[self.index + 1]
+                operand = self.memory[self.index + 1]
             elif opcode[2] == '2':
-                operand = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                operand = self.memory[self.memory[self.index + 1] + self.relative_base]
             if not operand:
                 if opcode[1] == '0':
-                    self.index = self.intcode[self.intcode[self.index + 2]]
+                    self.index = self.memory[self.memory[self.index + 2]]
                 elif opcode[1] == '1':
-                    self.index = self.intcode[self.index + 2]
+                    self.index = self.memory[self.index + 2]
                 elif opcode[1] == '2':
-                    self.index = self.intcode[self.intcode[self.index + 2] + self.relative_base]
+                    self.index = self.memory[self.memory[self.index + 2] + self.relative_base]
             else:
                 self.index += 3
         ### LESS THAN
         elif opcode[-2:] == '07':
             if opcode[2] == '0':
-                first = self.intcode[self.intcode[self.index + 1]]
+                first = self.memory[self.memory[self.index + 1]]
             elif opcode[2] == '1':
-                first = self.intcode[self.index + 1]
+                first = self.memory[self.index + 1]
             elif opcode[2] == '2':
-                first = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                first = self.memory[self.memory[self.index + 1] + self.relative_base]
             if opcode[1] == '0':
-                second = self.intcode[self.intcode[self.index + 2]]
+                second = self.memory[self.memory[self.index + 2]]
             elif opcode[1] == '1':
-                second = self.intcode[self.index + 2]
+                second = self.memory[self.index + 2]
             elif opcode[1] == '2':
-                second = self.intcode[self.intcode[self.index + 2] + self.relative_base]
+                second = self.memory[self.memory[self.index + 2] + self.relative_base]
             output = 1 if first < second else 0
             if opcode[0] == '0':
-                self.intcode[self.intcode[self.index + 3]] = output
+                self.memory[self.memory[self.index + 3]] = output
             elif opcode[0] == '1':
-                self.intcode[self.index + 3] = output
+                self.memory[self.index + 3] = output
             elif opcode[0] == '2':
-                self.intcode[self.intcode[self.index + 3] + self.relative_base] = output
+                self.memory[self.memory[self.index + 3] + self.relative_base] = output
             self.index += 4
         ### EQUALS
         elif opcode[-2:] == '08':
             if opcode[2] == '0':
-                first = self.intcode[self.intcode[self.index + 1]]
+                first = self.memory[self.memory[self.index + 1]]
             elif opcode[2] == '1':
-                first = self.intcode[self.index + 1]
+                first = self.memory[self.index + 1]
             elif opcode[2] == '2':
-                first = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                first = self.memory[self.memory[self.index + 1] + self.relative_base]
             if opcode[1] == '0':
-                second = self.intcode[self.intcode[self.index + 2]]
+                second = self.memory[self.memory[self.index + 2]]
             elif opcode[1] == '1':
-                second = self.intcode[self.index + 2]
+                second = self.memory[self.index + 2]
             elif opcode[1] == '2':
-                second = self.intcode[self.intcode[self.index + 1] + self.relative_base]
+                second = self.memory[self.memory[self.index + 2] + self.relative_base]
             output = 1 if first == second else 0
             if opcode[0] == '0':
-                self.intcode[self.intcode[self.index + 3]] = output
+                self.memory[self.memory[self.index + 3]] = output
             elif opcode[0] == '1':
-                self.intcode[self.index + 3] = output
+                self.memory[self.index + 3] = output
+            elif opcode[0] == '2':
+                self.memory[self.memory[self.index + 3] + self.relative_base] = output
             self.index += 4
         ### ADJUST RELATIVE BASE
         elif opcode[-2:] == '09':
-            pass #TODO(opcode 09)
+            if opcode[2] == '0':
+                self.relative_base += self.memory[self.memory[self.index + 1]]
+            elif opcode[2] == '1':
+                self.relative_base += self.memory[self.index + 1]
+            elif opcode[2] == '2':
+                self.relative_base += self.memory[self.memory[self.index + 1] + self.relative_base]
+            self.index += 2
         ### HALT CODE
         elif opcode[-2:] == '99':
             self.state = "halted"
         else:
             self.state = "unexpected"
-        # print(self.intcode)
+        # print(self.memory)
 
     def computer_state(self):
         return self.state
 
     
     def new_input(self, input):
-        self.intcode_input.append(input)
+        self.memory_input.append(input)
         self.state = "running"
 
     
@@ -196,6 +206,8 @@ class IntcodeComputer:
         return self.state, self.index, self.max_index, self.output
 
 
+    def set_state(self, state):
+        self.state = state
 
 # OLD INTCODE COMPUTER (PROCEDURAL)
 """
