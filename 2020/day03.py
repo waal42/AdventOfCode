@@ -18,16 +18,17 @@ def part_one():
 
 # print(part_one())
 
+
 def part_two():
     height = len(map_of_trees)
     width = len(map_of_trees[0])
     product = 1
     slopes = [
-        {'x' : 1, 'y' : 1, 'trees' : 0},
-        {'x' : 3, 'y' : 1, 'trees' : 0},
-        {'x' : 5, 'y' : 1, 'trees' : 0},
-        {'x' : 7, 'y' : 1, 'trees' : 0},
-        {'x' : 1, 'y' : 2, 'trees' : 0}]
+        {'x': 1, 'y': 1, 'trees': 0},
+        {'x': 3, 'y': 1, 'trees': 0},
+        {'x': 5, 'y': 1, 'trees': 0},
+        {'x': 7, 'y': 1, 'trees': 0},
+        {'x': 1, 'y': 2, 'trees': 0}]
     for slope in slopes:
         x, y = 0, 0
         while y < height:
@@ -37,7 +38,6 @@ def part_two():
             y = (y + slope['y'])
         product *= slope['trees']
     return product
-
 
 
 print(part_two())

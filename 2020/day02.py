@@ -31,6 +31,7 @@ def part_one():
 
 # print(part_one())
 
+
 def part_two():
     valid_passwords = 0
     for password in passwords:
