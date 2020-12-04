@@ -95,30 +95,33 @@ def isHairColor(hcl):
 
 
 def isEyeColor(ecl):
-    if ecl in ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]:
-        return True
-    else:
-        return False
+    return ecl in ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
 
 
 def isPassportID(pid):
-    if len(pid) == 9:
-        return True
-    else:
-        return False
+    return len(pid) == 9
+
+
+validations = {
+    'byr': isBirthYear,
+    'iyr': isIssueYear,
+    'eyr': isExpirationYear,
+    'hgt': isHeight,
+    'hcl': isHairColor,
+    'ecl': isEyeColor,
+    'pid': isPassportID,
+}
 
 
 def part_two():
     valid_passports = 0
     for passport in pass_dict:
-        if 'byr' in passport.keys() and isBirthYear(passport['byr']):
-            if 'iyr' in passport.keys() and isIssueYear(passport['iyr']):
-                if 'eyr' in passport.keys() and isExpirationYear(passport['eyr']):
-                    if 'hgt' in passport.keys() and isHeight(passport['hgt']):
-                        if 'hcl' in passport.keys() and isHairColor(passport['hcl']):
-                            if 'ecl' in passport.keys() and isEyeColor(passport['ecl']):
-                                if 'pid' in passport.keys() and isPassportID(passport['pid']):
-                                    valid_passports += 1
+        valid_fields = 0
+        for field in validations.keys():
+            if field in passport.keys() and validations[field](passport[field]):
+                valid_fields += 1
+        if valid_fields == 7:
+            valid_passports += 1
     return valid_passports
 
 
