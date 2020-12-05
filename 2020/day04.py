@@ -116,11 +116,10 @@ validations = {
 def part_two():
     valid_passports = 0
     for passport in pass_dict:
-        valid_fields = 0
+        valid_fields = True
         for field in validations.keys():
-            if field in passport.keys() and validations[field](passport[field]):
-                valid_fields += 1
-        if valid_fields == 7:
+            valid_fields = valid_fields and field in passport.keys() and validations[field](passport[field])
+        if valid_fields:
             valid_passports += 1
     return valid_passports
 
