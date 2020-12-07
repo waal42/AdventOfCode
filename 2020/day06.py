@@ -4,14 +4,18 @@ start = time()
 
 with open("day06input.txt", "r") as file_in:
     grouped_answers = [x.replace("\n", " ").split(" ")
-                 for x in file_in.read().rstrip().split("\n\n")]
+                       for x in file_in.read().rstrip().split("\n\n")]
 
 
-def part_one():
+'''def part_one():
     sum_of_answers = 0
     for group in grouped_answers:
         sum_of_answers += len(set(''.join(group)))
     return sum_of_answers
+'''
+
+def part_one():
+    return sum([len(set(''.join(group))) for group in grouped_answers])
 
 print(part_one())
 
@@ -24,6 +28,7 @@ def part_two():
             answers = set(answers).intersection(answer)
         sum_of_answers += len(answers)
     return sum_of_answers
+
 
 print(part_two())
 
