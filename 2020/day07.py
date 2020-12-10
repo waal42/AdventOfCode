@@ -33,7 +33,7 @@ def get_insides(luggage, insides):
 luggage_tree = dict()
 for luggage in luggage_rules.keys():
     insides = list()
-    luggage_tree[luggage] = list(set(get_insides(luggage, insides)))
+    luggage_tree[luggage] = get_insides(luggage, insides)
 
 # pprint(luggage_tree)
 
@@ -45,15 +45,41 @@ def part_one(bag_to_find):
     return options
 
 
-# print(part_one('shiny gold'))
+print(part_one('shiny gold'))
+
+def count_insides(luggage, expr):
+    if luggage_rules[luggage]:
+        expr.append("(")
+        for in_luggage in luggage_rules[luggage].keys():
+            expr + count_insides(in_luggage, expr)
+            expr.append(str(luggage_rules[luggage][in_luggage]))
+            expr.append("+")
+        expr.pop()
+        expr.append(")")
+        expr.append("*")
+    else:
+        expr = []
+    return expr
 
 
 def part_two():
-    # TODO úplně všechno
-    pass
+    expr = count_insides("shiny gold", [])
+    new_expr = []
+    index = 1 # zbaveni se prvni zavorky
+    while index < len(expr):
+        if expr[index] == ')' and expr[index + 1] == '*':
+            new_expr.append('+1') # kdyz za zavorkou nasobim, tak pred ni pripocitam prdchozi kufr
+            new_expr.append(expr[index])
+            new_expr.append(expr[index + 1])
+            index += 2
+        else:
+            new_expr.append(expr[index])
+            index += 1
+    str_new_expr = ''.join(new_expr[:-3]) # osklive zbaveni se +1)* na konci
+    return str_new_expr
 
 
-print(part_two())
+print(eval(part_two()))
 
 
 print("computed in " + str(time() - start) + " seconds")
