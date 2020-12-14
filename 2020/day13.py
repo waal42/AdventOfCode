@@ -2,19 +2,18 @@ from time import time
 
 start = time()
 
-with open("day13testinput.txt", "r") as file_in:
+with open("day13input.txt", "r") as file_in:
     data = [x for x in file_in.read().rstrip().split("\n")]
     earliest = int(data[0])
     operational = []
-    rel_departures = {}
+    rel_departures = []
     bus_schedule = data[1].split(',')
     for bus in range(len(bus_schedule)):
         if bus_schedule[bus] != 'x':
-            operational.append(int(bus_schedule[bus]))
-            rel_departures[bus] = int(bus_schedule[bus])
-        else:
-            rel_departures[bus] = 'x'
-
+            bus_num = int(bus_schedule[bus])
+            rem = (bus_num - bus) % bus_num
+            operational.append(int(bus_num))
+            rel_departures.append({'rem': rem, 'mod': bus_num})
 
 
 
@@ -32,26 +31,50 @@ def part_one():
                 break
     return bus*(timestamp-earliest)             
     
-# print(part_one())
+print(part_one())
 
-print(rel_departures)
+# print(rel_departures)
 
-'''
-0,  1, 2, 3,  4, 5,  6,  7
-7, 13, x, x, 59, x, 31, 19
+def max_size(numlist):
+    result = 1
+    for num in numlist:
+        result *= num
+    return result
 
-x == ?
-7  | x
-13 | x+1
-59 | x+4
-31 | x+6
-19 | x+7
 
-'''
+def mods_without_this(this_mod, numlist):
+    result = 1
+    for mod in numlist:
+        if mod != this_mod:
+            result *= mod
+    return result
+
+
+def mmi(num, mod): # modular multiplicative inverse
+    reduced_num = num % mod
+    k = 1
+    found = False
+    while not found:
+        if k*reduced_num % mod == 1:
+            found = True
+        else:
+            k += 1
+    return k
 
 
 def part_two():
-    min_timestamp = 1000
+    departures = rel_departures
+    bus_mods = operational
+    total_M = max_size(bus_mods)
+    timestamp = 0
+    for bus in departures:
+        if bus['rem'] != 0:
+            # print ("x =", bus['rem'], "mod", bus['mod'])
+            s = mods_without_this(bus['mod'], bus_mods)
+            t = mmi(s, bus['mod'])
+            q = s*t % total_M
+            timestamp += bus['rem']*q
+    return timestamp % total_M
 
 
 print(part_two())
