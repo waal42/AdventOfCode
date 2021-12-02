@@ -12,13 +12,13 @@ with open("day02input.txt", "r") as file_in:
 def part_one():
     hor = 0
     depth = 0
-    for instr in instructions:
-        if instr[0] == "forward":
-            hor += instr[1]
-        elif instr[0] == "down":
-            depth += instr[1]
-        elif instr[0] == "up":
-            depth -= instr[1]
+    for instr, val in instructions:
+        if instr == "forward":
+            hor += val
+        elif instr == "down":
+            depth += val
+        elif instr == "up":
+            depth -= val
     return hor*depth
 
 
@@ -26,14 +26,14 @@ def part_two():
     hor = 0
     depth = 0
     aim = 0
-    for instr in instructions:
-        if instr[0] == "forward":
-            hor += instr[1]
-            depth += aim * instr[1]
-        elif instr[0] == "down":
-            aim += instr[1]
-        elif instr[0] == "up":
-            aim -= instr[1]
+    for instr, val in instructions:
+        if instr == "forward":
+            hor += val
+            depth += aim * val
+        elif instr == "down":
+            aim += val
+        elif instr == "up":
+            aim -= val
     return hor*depth
 
 
