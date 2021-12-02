@@ -7,12 +7,14 @@ with open("day01input.txt", "r") as file_in:
 
 # print(depths)
 
+
 def part_one(list_of_depths):
     increases = 0
     for i in range(len(list_of_depths) - 1):
         if (list_of_depths[i+1] - list_of_depths[i] > 0):
             increases += 1
     return increases
+
 
 def part_two():
     triplets_of_depths = list()
