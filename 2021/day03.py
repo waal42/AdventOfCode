@@ -65,9 +65,6 @@ def part_two():
         co2 = new_co2
         # print(oxygen, co2)
     return int(''.join(oxygen[0]), 2) * int(''.join(co2[0]), 2)
-    
-
-
 
 
 print(part_one())
