@@ -11,7 +11,7 @@ with open("day06input.txt", "r") as file_in:
         catalog[i] = 0
     for fish in lanternfish:
         catalog[fish] += 1
-    
+
 print(catalog)
 
 
@@ -32,6 +32,7 @@ def part_one():
         # print(lanternfish)
     return(len(lanternfish))
 
+
 def part_two():
     days = 0
     while (days < 256):
@@ -45,8 +46,11 @@ def part_two():
     return sum(catalog.values())
 
 
+first = time()
 print(part_one())
-
+print("part one computed in " + str(time() - first) + " seconds")
+second = time()
 print(part_two())
+print("part two computed in " + str(time() - second) + " seconds")
 
-print("computed in " + str(time() - start) + " seconds")
+print("completely computed in " + str(time() - start) + " seconds")
