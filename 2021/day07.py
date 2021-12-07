@@ -17,11 +17,15 @@ def triangular_num(num):
 
 
 def part_one():
-    fuel = 0
+    fuels = list()
     position = int(stat.median(crabs))
-    for crab in crabs:
-        fuel += abs(crab-position)
-    return fuel
+    more_positions = [x for x in range(position-2, position+3)]
+    for near in more_positions:
+        fuel = 0
+        for crab in crabs:
+            fuel += abs(crab-near)
+        fuels.append(fuel)
+    return min(fuels)
 
 
 def part_two():
