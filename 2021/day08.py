@@ -88,7 +88,6 @@ def part_two():
                         output.append(str(list(numbers.keys())[
                                       list(numbers.values()).index(sorted(out_digit_keys))]))
                     output_values += int(''.join(output))
-                    break
     return output_values
 
 
