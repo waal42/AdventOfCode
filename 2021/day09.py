@@ -41,7 +41,7 @@ def find_basin(current_basin, visited):
                         add_to_basin.append(
                             (position[0] + directions[direction][0], position[1] + directions[direction][1]))
             add_to_visited.append(position)
-    return [add_to_basin, add_to_visited]
+    return add_to_basin, add_to_visited
 
 
 def part_one():
@@ -59,13 +59,13 @@ def part_two():
     for low_point in low_points:
         basin = [low_point]
         visited = list()
-        while(len(set(visited)) < len(set(basin))):
+        while(len(visited) < len(basin)):
             for position in basin:
                 if position not in visited:
                     new_positions = find_basin(basin, visited)
                     basin = list(set(basin + new_positions[0]))
                     visited = list(set(visited + new_positions[1]))
-        basins.append(len(set(basin)))
+        basins.append(len(basin))
     sorted_basins = sorted(basins, reverse=True)[:3]
     return prod(sorted_basins)
 
