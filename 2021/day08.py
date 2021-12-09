@@ -61,6 +61,7 @@ def part_two():
                 remaining.append(letter)
         possibilites = permutations(remaining)
         for possibility in list(possibilites):
+            found = False
             segs['2'] = possibility[0]
             segs['4'] = possibility[1]
             segs['5'] = possibility[2]
@@ -79,6 +80,7 @@ def part_two():
                         good_digits.append(list(numbers.keys())[list(
                             numbers.values()).index(sorted_digit_keys)])
                 if len(good_digits) == 10:
+                    found = True
                     output = list()
                     for out in signal[1]:
                         out_digit_keys = list()
@@ -88,6 +90,8 @@ def part_two():
                         output.append(str(list(numbers.keys())[
                                       list(numbers.values()).index(sorted(out_digit_keys))]))
                     output_values += int(''.join(output))
+            if found:
+                break
     return output_values
 
 
