@@ -61,9 +61,10 @@ def part_two():
         visited = list()
         while(len(set(visited)) < len(set(basin))):
             for position in basin:
-                new_positions = find_basin(basin, visited)
-                basin = list(set(basin + new_positions[0]))
-                visited = list(set(visited + new_positions[1]))
+                if position not in visited:
+                    new_positions = find_basin(basin, visited)
+                    basin = list(set(basin + new_positions[0]))
+                    visited = list(set(visited + new_positions[1]))
         basins.append(len(set(basin)))
     sorted_basins = sorted(basins, reverse=True)[:3]
     return prod(sorted_basins)
