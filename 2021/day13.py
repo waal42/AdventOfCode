@@ -1,14 +1,14 @@
-from time import time
+from time import perf_counter
 from copy import deepcopy
 
-start = time()
+start = perf_counter()
 
-in_time = time()
+in_time = perf_counter()
 with open("day13input.txt", "r") as file_in:
     [raw_dots,raw_folds] = [[x for x in block.split("\n")] for block in file_in.read().rstrip().split("\n\n")]
     dots = [{'x': int(dot.split(',')[0]),'y': int(dot.split(',')[1])} for dot in raw_dots]
     folds = [fold.split(" ")[2].split("=") for fold in raw_folds]
-print("input processed in " + str(time() - in_time) + " seconds")
+print("input processed in " + str(perf_counter() - in_time) + " seconds")
 
 # print(dots, folds)
 
@@ -64,11 +64,11 @@ def part_two():
 
 
 
-first = time()
+first = perf_counter()
 print(part_one())
-print("part one computed in " + str(time() - first) + " seconds")
-second = time()
+print("part one computed in " + str(perf_counter() - first) + " seconds")
+second = perf_counter()
 print(part_two())
-print("part two computed in " + str(time() - second) + " seconds")
+print("part two computed in " + str(perf_counter() - second) + " seconds")
 
-print("completely computed in " + str(time() - start) + " seconds")
+print("completely computed in " + str(perf_counter() - start) + " seconds")

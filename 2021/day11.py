@@ -1,12 +1,12 @@
-from time import time
+from time import perf_counter
 
-start = time()
+start = perf_counter()
 
-in_time = time()
+in_time = perf_counter()
 with open("day11input.txt", "r") as file_in:
     octopuses = [[int(x) for x in line]
                  for line in file_in.read().rstrip().split("\n")]
-print("input processed in " + str(time() - in_time) + " seconds")
+print("input processed in " + str(perf_counter() - in_time) + " seconds")
 
 neighbors = [[-1, -1], [-1, 0], [-1, 1],
              [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
@@ -78,11 +78,11 @@ def part_two():
     return count_steps
 
 
-first = time()
+first = perf_counter()
 print(part_one())
-print("part one computed in " + str(time() - first) + " seconds")
-second = time()
+print("part one computed in " + str(perf_counter() - first) + " seconds")
+second = perf_counter()
 print(part_two())
-print("part two computed in " + str(time() - second) + " seconds")
+print("part two computed in " + str(perf_counter() - second) + " seconds")
 
-print("completely computed in " + str(time() - start) + " seconds")
+print("completely computed in " + str(perf_counter() - start) + " seconds")
